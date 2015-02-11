@@ -23,11 +23,11 @@
 /* Use exact=0 unless you know EXACTLY what you are doing. */
 // void *initHash(int limit, int exact)
 hashTable *initHash(int limit, int exact)
-
 {
   hashTable *ht;
   int i;
-  int primes [] = {127, 211, 379, 439, 521, 571, 619, 691, 761, 829, 977, 1009, 1259, 1427, 1553, 1697, 1933, 2153, 2333, 2467, 3079, 3539, 4357, 5039, 5323, 5569, 5827, 6151, 6547, 6871, 7237, 7537, 7877, 8167, 8191, 8329, 8539, 8707, 8863, 9049, 9239, 9419, 9601, 9769, 9931, 12289, 24593, 49157, 98317, 196613, 393241, 786433, 1572869, 3145739, 6291469, 12582917, 25165843, 50331653, 100663319, 201326611, 402653189, 805306457, 1610612741};
+  // int primes [] = {127, 211, 379, 439, 521, 571, 619, 691, 761, 829, 977, 1009, 1259, 1427, 1553, 1697, 1933, 2153, 2333, 2467, 3079, 3539, 4357, 5039, 5323, 5569, 5827, 6151, 6547, 6871, 7237, 7537, 7877, 8167, 8191, 8329, 8539, 8707, 8863, 9049, 9239, 9419, 9601, 9769, 9931, 12289, 24593, 49157, 98317, 196613, 393241, 786433, 1572869, 3145739, 6291469, 12582917, 25165843, 50331653, 100663319, 201326611, 402653189, 805306457, 1610612741};
+  int primes [20] = { 3079, 6151, 12289, 24593, 49157, 98317, 196613, 393241, 786433, 1572869, 3145739, 6291469, 12582917, 25165843, 50331653, 100663319, 201326611, 402653189, 805306457, 1610612741};
 
   ht = (hashTable *) malloc(sizeof(hashTable));
   if (exact == 1)
@@ -35,14 +35,15 @@ hashTable *initHash(int limit, int exact)
   else
   {
     //inital number 1.35
-    for (i = 0; primes[i] < 5 * limit; i++);
-    ht->size = primes[i];
+    // for (i = 0; primes[i] < 5 * limit; i++);
+    for (i = 0; primes[i] < 1.35 * limit; i++);  
+      ht->size = primes[i];
   }
   printf("table size: %d\n", ht->size);
-  ht->table = (unsigned short *) malloc(ht->size * sizeof(unsigned short));
+  ht->table = (int *) malloc(ht->size * sizeof(int));
   if (ht->table == NULL)  printf("Hash-internal error: Cannot alloc memory!\n");
 
-  for (i = 0; i < ht->size; i++)  ht->table[i] = 0;
+  for (i = 0; i < ht->size; i++)  ht->table[i] = -1;
   return(ht);
 }
 
@@ -95,7 +96,7 @@ void clearHash(hashTable *ht)
 {
   int i;
 
-  for (i = 0; i < ht->size; i++)  ht->table[i] = 0;
+  for (i = 0; i < ht->size; i++)  ht->table[i] = -1;
 }
 
 

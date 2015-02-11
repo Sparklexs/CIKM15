@@ -83,6 +83,24 @@ void algo_toplayer::operator() (const vector<vector<float> > &top_layer_model,
 								const vector<uint> &intersection_block_boundry,
 								CluewebReader* Reader, int qn, toplayers& tls,toplayers& otls, pairlists& pls, pairlists& opls, lptrArray& lps, const int topK, profilerC& p, int qid) {
 
+	hashTable *ht;
+	fullinfo node;
+	ht = initHash(2091, 0);
+	//int insertHash(hashTable *ht, int key, int elem, int overwrite, vector<T> & a)
+	insertHash(ht, 1261, 0, 0, Accumulator_Vector);
+	node.did = 1261;
+	Accumulator_Vector.push_back(node);
+	insertHash(ht, 3261, 1, 0, Accumulator_Vector);
+	node.did = 3261;
+	Accumulator_Vector.push_back(node);
+	insertHash(ht, 6261, 2, 0, Accumulator_Vector);
+	node.did = 6261;
+	Accumulator_Vector.push_back(node);
+	//int lookupHash(hashTable *ht, int key, vector<T>& a)
+	lookupHash(ht, 3261, Accumulator_Vector);
+	exit(0);
+
+
 	/*number of single terms we have*/
         number_of_singles = tls.cutoffs.size();
         /*number of pairs we have*/

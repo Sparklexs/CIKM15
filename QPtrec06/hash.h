@@ -20,7 +20,7 @@ using namespace std;
 
 typedef struct {
   int size;
-  unsigned short * table; 
+  int * table; 
 } hashTable;
 
 
@@ -44,28 +44,28 @@ void destroyHash(hashTable *ht);
 
 // int insertHash(hashTable *ht, int key, short elem, int overwrite, vector<int> & a, int& hit);
 
-int insertHash(hashTable *ht, int key, unsigned short elem, int overwrite, vector<int> & a);
+// int insertHash(hashTable *ht, int key, unsigned short elem, int overwrite, vector<int> & a);
 
-short lookupHash(hashTable *ht, int key, vector<int> & a);
+// short lookupHash(hashTable *ht, int key, vector<int> & a);
 
-int GETKEY(unsigned short e, vector<int> & a);
+// int GETKEY(unsigned short e, vector<int> & a);
 
 
 
 
 //int insertHash(hashTable *ht, int key, short elem, int overwrite, vector<int> & a);
 template<typename T>
-int insertHash(hashTable *ht, int key, short elem, int overwrite, vector<T> & a)
+int insertHash(hashTable *ht, int key, int elem, int overwrite, vector<T> & a)
 {
-  // printf("key to insert: %d ", key);
-  // printf("elem to insert: %d \n", elem);
+  printf("key to insert: %d ", key);
+  printf("elem to insert: %d ", elem);
   int atry;
   unsigned int pos;
 
   // key = GETKEY(elem, a);
   atry = 0;
   pos = HASH(key, atry, ht->size);
-  while ((ht->table[pos] != 0) && (GETKEY(ht->table[pos], a) != key))
+  while ((ht->table[pos] != -1) && (GETKEY(ht->table[pos], a) != key))
   {
     atry++;
     if (atry > 100000)
@@ -77,29 +77,29 @@ int insertHash(hashTable *ht, int key, short elem, int overwrite, vector<T> & a)
   }
     // hit += atry+1;
 
-  if (ht->table[pos] == 0)  
+  if (ht->table[pos] == -1)  
   {
-    // printf("pos to insert: %d \n", pos);
-    ht->table[pos] = elem + 1;
+    printf("pos to insert: %d \n", pos);
+    ht->table[pos] = elem;
     return(0);
   }
   else
   { 
-    if (overwrite)  ht->table[pos] = elem + 1;
-    return pos+1;
+    if (overwrite)  ht->table[pos] = elem;
+    return pos+1; //The reason +1 is that, pos maybe zero, so all plus one to distinguish from the case above.
     // return(1);
   }
 }
 
 template<typename T>
-short lookupHash(hashTable *ht, int key, vector<T>& a)
+int lookupHash(hashTable *ht, int key, vector<T>& a)
 {
-int atry;
+  int atry;
   unsigned int pos;
 
   atry = 0;
   pos = HASH(key, atry, ht->size);
-  while ((ht->table[pos] != 0) && (GETKEY(ht->table[pos], a) != key))
+  while ((ht->table[pos] != -1) && (GETKEY(ht->table[pos], a) != key))
   {
     atry++;
     if (atry > 100000)
@@ -115,10 +115,10 @@ int atry;
 }
 
 template<typename T>
-int GETKEY(short e, vector<T> & a){
+int GETKEY(int e, vector<T> & a){
   if(e<=a.size()){
       // printf("getkey at %d \n", e-1);
-      return a.at(e - 1).did; // store the actual offset + 1, since 0 marks no element, so 1 for 0, 2 for 1, etc.
+      return a[e].did; // store the actual offset
   }else{
     return -1;
   }
