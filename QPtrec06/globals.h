@@ -167,7 +167,8 @@ namespace CONSTS {
 	// const std::string testingQuery("/home/qw376/1.28/trec06_training_lm_unique");
 	// const std::string testingQuery("/home/qw376/pair_lex/bigram_drop_prob_12.1_nodup");
 	// const std::string testingQuery("/home/qw376/1.28/trec06_testing_lm_unique");
-	const std::string testingQuery("/home/qw376/special_query_trace/09query_qid");
+	// const std::string testingQuery("/home/qw376/special_query_trace/09query_qid"); 
+	const std::string testingQuery("/home/qw376/1.28/trec_06_testing_12.12");
 	// const std::string testingQuery("/home/qw376/1.28/check_query");
 	// const std::string testingQuery("/home/qw376/1.28/trec_06_testing_actualqueries_11.22_no_colon"); //main query
 	// const std::string testingQuery("/home/qw376/1.28/trec_06_training_actualqueries_11.22_no_colon"); //main query
@@ -413,7 +414,7 @@ namespace CONSTS {
 	const uint Query_Budget_TopLayer = 1000;
 	const uint Query_Budget_TermPair = 3000;
 	const uint Query_Budget = 5000;
-	const std::string Candidates_Pool("/home/qw376/1.28/Candidates_R_special");//Candidates index
+	const std::string Candidates_Pool("/home/qw376/1.28/Candidates_R");//Candidates index
 	const uint Num_Doc_for_Lookups = 2000;
 	const uint lookup_budget = 20000;
 	const uint num_of_candidate = 2000;

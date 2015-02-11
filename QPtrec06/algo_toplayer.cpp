@@ -73,6 +73,8 @@ algo_toplayer::algo_toplayer(unsigned int* pgs){
 	/*to devide the pairs*/
 	dem = "+";
 
+	ht = initHash(CONSTS::Query_Budget, 0);
+
 }
 
 void algo_toplayer::operator() (const vector<vector<float> > &top_layer_model,
@@ -83,30 +85,31 @@ void algo_toplayer::operator() (const vector<vector<float> > &top_layer_model,
 								const vector<uint> &intersection_block_boundry,
 								CluewebReader* Reader, int qn, toplayers& tls,toplayers& otls, pairlists& pls, pairlists& opls, lptrArray& lps, const int topK, profilerC& p, int qid) {
 
-	hashTable *ht;
-	fullinfo node;
-	ht = initHash(2091, 0);
-	//int insertHash(hashTable *ht, int key, int elem, int overwrite, vector<T> & a)
-	insertHash(ht, 1261, 0, 0, Accumulator_Vector);
-	node.did = 1261;
-	Accumulator_Vector.push_back(node);
-	insertHash(ht, 3261, 1, 0, Accumulator_Vector);
-	node.did = 3261;
-	Accumulator_Vector.push_back(node);
-	insertHash(ht, 6261, 2, 0, Accumulator_Vector);
-	node.did = 6261;
-	Accumulator_Vector.push_back(node);
-	//int lookupHash(hashTable *ht, int key, vector<T>& a)
-	lookupHash(ht, 3261, Accumulator_Vector);
-	exit(0);
+	// hashTable *ht;
+	// fullinfo node;
+	// ht = initHash(2091, 0);
+	// //int insertHash(hashTable *ht, int key, int elem, int overwrite, vector<T> & a)
+	// insertHash(ht, 1261, 0, 0, Accumulator_Vector);
+	// node.did = 1261;
+	// Accumulator_Vector.push_back(node);
+	// insertHash(ht, 3261, 1, 0, Accumulator_Vector);
+	// node.did = 3261;
+	// Accumulator_Vector.push_back(node);
+	// insertHash(ht, 6261, 2, 0, Accumulator_Vector);
+	// node.did = 6261;
+	// Accumulator_Vector.push_back(node);
+	// //int lookupHash(hashTable *ht, int key, vector<T>& a)
+	// lookupHash(ht, 3261, Accumulator_Vector);
+	// lookupHash(ht, 8261, Accumulator_Vector);
+	// exit(0);
 
 
 	/*number of single terms we have*/
-        number_of_singles = tls.cutoffs.size();
-        /*number of pairs we have*/
-        number_of_pairs = pls.cutoffs.size();
+    number_of_singles = tls.cutoffs.size();
+    /*number of pairs we have*/
+    number_of_pairs = pls.cutoffs.size();
 	/*total structures we have*/
-        total_number_of_structures = number_of_singles + number_of_pairs;
+    total_number_of_structures = number_of_singles + number_of_pairs;
 
  	load_singlelists_tomap(tls, otls);
 
@@ -167,15 +170,15 @@ void algo_toplayer::operator() (const vector<vector<float> > &top_layer_model,
 	// cout<<"after merge"<<endl;
 	
 	p.start(CONSTS::SORT);
-        /*sort the Accumulator by score first before we do lookups, according to score*/
-        sort(Accumulator_Vector.begin(), Accumulator_Vector.end(), sortcdt);
+    /*sort the Accumulator by score first before we do lookups, according to score*/
+    sort(Accumulator_Vector.begin(), Accumulator_Vector.end(), sortcdt);
 
-        /*Do lookups on this small set*/
-        if(Accumulator_Vector.size()>CONSTS::Num_Doc_for_Lookups)
-              Accumulator_Vector.resize(CONSTS::Num_Doc_for_Lookups);
+    /*Do lookups on this small set*/
+    if(Accumulator_Vector.size()>CONSTS::Num_Doc_for_Lookups)
+          Accumulator_Vector.resize(CONSTS::Num_Doc_for_Lookups);
 
 
-        sort(Accumulator_Vector.begin(), Accumulator_Vector.end(), sort_by_did);
+    sort(Accumulator_Vector.begin(), Accumulator_Vector.end(), sort_by_did);
 	p.end(CONSTS::SORT);
 
 	
@@ -387,16 +390,14 @@ void algo_toplayer::TAAT_merge(){
 
 		for(int i = 0; i<it->second.size(); ++i){
 			int did = it->second[i].did;
-
 			//check if we have met this did before
-			map<int, int>::iterator iter;
-			iter = Did_to_Index_Map.find(did);
-			//If it does not exist, then push it in the accumulator and the map
-			if(iter == Did_to_Index_Map.end()){
+			//if it does not exist, then push it in the accumulator and the map 
+			int index = lookupHash(ht, did, Accumulator_Vector);
+			// cout<<"index: "<<index<<endl;
+			if((index==-1)){
 				//put it in the map
-				Did_to_Index_Map[did] = num_of_did_tracker;
+				insertHash(ht, did, num_of_did_tracker, 0, Accumulator_Vector);
 				++num_of_did_tracker;
-
 				//put it in the accumulator
 				fullinfo node;
 				node.did = did;
@@ -409,22 +410,21 @@ void algo_toplayer::TAAT_merge(){
 				//bitset<8> x(node.kbits);
 				//if(did == 39237070) 
 				//cout<<node.did<<": "<<node.score<<" "<<x<<" "<<it->first<<endl;
-				
-			}else{ //if it does exist, update the score and known level
 
-				Accumulator_Vector[iter->second].score += it->second[i].score;
-				Accumulator_Vector[iter->second].kbits &= (termbits_Map[it->first]);
-				Accumulator_Vector[iter->second].coverage = Get_Coverage_From_Kbits(Accumulator_Vector[iter->second].kbits);
+			}else{ //If it does exist, update the score and known level
+				Accumulator_Vector[index].score += it->second[i].score;
+				Accumulator_Vector[index].kbits &= (termbits_Map[it->first]);
+				Accumulator_Vector[index].coverage = Get_Coverage_From_Kbits(Accumulator_Vector[index].kbits);
 				
 				//bitset<8> x(Accumulator_Vector[iter->second].kbits);
 				//if(did == 39237070)
-                                //cout<<did<<": "<<it->second[i].score<<" "<<x<<" "<<it->first<<endl;
-				
+                //cout<<did<<": "<<it->second[i].score<<" "<<x<<" "<<it->first<<endl;				
+			
 			}
 		}
 
 	}//singles finished
-
+	// cout<<"after singles"<<endl;
 	//for the pairs merging
 	 for(map<string, vector<pinfo>>::iterator it = TermPair_Map.begin(); it!=TermPair_Map.end(); ++it){
 
@@ -437,12 +437,11 @@ void algo_toplayer::TAAT_merge(){
 	 	for(int i = 0; i<it->second.size(); ++i){
 	 		int did = it->second[i].did;
 	 		//check if we have met this did before
-	 		map<int, int>::iterator iter;
-	 		iter = Did_to_Index_Map.find(did);
-	 		//If it does not exist, then push it in the accumulator and the map
-	 		if(iter == Did_to_Index_Map.end()){
+	 		int index = lookupHash(ht, did, Accumulator_Vector);
+	 		//If it does not exist, then push it in the accumulator and the map 
+	 		if((index==-1)){
 	 			//put it in the map
-	 			Did_to_Index_Map[did] = num_of_did_tracker;
+	 			insertHash(ht, did, num_of_did_tracker, 0, Accumulator_Vector);
 	 			++num_of_did_tracker;
 
 	 			//put it in the accumulator
@@ -456,29 +455,28 @@ void algo_toplayer::TAAT_merge(){
 				
 				//bitset<8> x(node.kbits);
 				//if(did == 39237070)
-                                //cout<<node.did<<": "<<it->second[i].s1<<" "<<it->second[i].s2<<" "<<x<<" "<<it->first<<endl; 
-				
+                //cout<<node.did<<": "<<it->second[i].s1<<" "<<it->second[i].s2<<" "<<x<<" "<<it->first<<endl; 
+
 	 		}else{ //if it does exist, update the score and known level
 				
-				//if(did == 39237070){
+                //if(did == 39237070){
 				//bitset<8> y(Accumulator_Vector[iter->second].kbits);
 				//bitset<8> a(termbits_Map[term1]);
 				//bitset<8> b(termbits_Map[term2]);
 				//cout<<y<<" "<<a<<" "<<b<<endl;
 				//}
 				
-	 			Accumulator_Vector[iter->second].score = Accumulator_Vector[iter->second].score + 
-	 													it->second[i].s1 * (( Accumulator_Vector[iter->second].kbits & (termbits_Map[term1])) != Accumulator_Vector[iter->second].kbits) +
-	 													it->second[i].s2 * (( Accumulator_Vector[iter->second].kbits & (termbits_Map[term2])) != Accumulator_Vector[iter->second].kbits);
-	 			Accumulator_Vector[iter->second].kbits = Accumulator_Vector[iter->second].kbits & (termbits_Map[term1]) & (termbits_Map[term2]);
-	 			Accumulator_Vector[iter->second].coverage = Get_Coverage_From_Kbits(Accumulator_Vector[iter->second].kbits);
+	 			Accumulator_Vector[index].score = Accumulator_Vector[index].score + 
+	 													it->second[i].s1 * (( Accumulator_Vector[index].kbits & (termbits_Map[term1])) != Accumulator_Vector[index].kbits) +
+	 													it->second[i].s2 * (( Accumulator_Vector[index].kbits & (termbits_Map[term2])) != Accumulator_Vector[index].kbits);
+	 			Accumulator_Vector[index].kbits = Accumulator_Vector[index].kbits & (termbits_Map[term1]) & (termbits_Map[term2]);
+	 			Accumulator_Vector[index].coverage = Get_Coverage_From_Kbits(Accumulator_Vector[index].kbits);
 				
 				//bitset<8> x(Accumulator_Vector[iter->second].kbits);
 				//if(did == 39237070){
                                 //cout<<did<<": "<<it->second[i].s1<<" "<<it->second[i].s2<<" "<<x<<" "<<it->first<<endl;
 				//cout<<Accumulator_Vector[iter->second].score<<endl;
-				//}
-				
+				//}			
 	 		}
 
 	 	}

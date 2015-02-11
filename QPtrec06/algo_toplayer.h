@@ -113,6 +113,9 @@ private:
  	size_t position;
  	short pre_compute_kbits;
 
+  /*hashtable*/
+  hashTable *ht;
+
 
 public:
 	algo_toplayer(unsigned int* pgs);

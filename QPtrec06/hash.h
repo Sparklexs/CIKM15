@@ -57,8 +57,8 @@ void destroyHash(hashTable *ht);
 template<typename T>
 int insertHash(hashTable *ht, int key, int elem, int overwrite, vector<T> & a)
 {
-  printf("key to insert: %d ", key);
-  printf("elem to insert: %d ", elem);
+  // printf("key to insert: %d ", key);
+  // printf("elem to insert: %d ", elem);
   int atry;
   unsigned int pos;
 
@@ -68,7 +68,7 @@ int insertHash(hashTable *ht, int key, int elem, int overwrite, vector<T> & a)
   while ((ht->table[pos] != -1) && (GETKEY(ht->table[pos], a) != key))
   {
     atry++;
-    if (atry > 100000)
+    if (atry > 10000)
     {
       printf("Hash-internal error: too many tries during insert!\n");
       return(0);
@@ -79,7 +79,7 @@ int insertHash(hashTable *ht, int key, int elem, int overwrite, vector<T> & a)
 
   if (ht->table[pos] == -1)  
   {
-    printf("pos to insert: %d \n", pos);
+    // printf("pos to insert: %d \n", pos);
     ht->table[pos] = elem;
     return(0);
   }
@@ -102,7 +102,7 @@ int lookupHash(hashTable *ht, int key, vector<T>& a)
   while ((ht->table[pos] != -1) && (GETKEY(ht->table[pos], a) != key))
   {
     atry++;
-    if (atry > 100000)
+    if (atry > 10000)
     {
       printf("Hash-internal error: too many tries during lookup!\n");
       return(0);
@@ -110,7 +110,8 @@ int lookupHash(hashTable *ht, int key, vector<T>& a)
     pos = HASH(key, atry, ht->size);
   }
 
-  printf("lookup, find at the pos: %d \n", pos);
+  // printf("The content in the hashtable: %d \n", ht->table[pos]);
+  // printf("lookup, find at the pos: %d \n", pos);
   return(ht->table[pos]);
 }
 
